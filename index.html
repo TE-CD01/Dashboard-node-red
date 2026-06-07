@@ -1371,9 +1371,9 @@ function connectFlaskLive(){const socket=io({transports:['websocket','polling'],
             const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
             let cls = 'drp-day';
             if(ds===todayStr) cls+=' drp-today';
-            // determine effective range for hover highlight (only while picking 'to')
+            // determine effective range for hover highlight
             let effFrom = drpFrom, effTo = drpTo;
-            if(picking === 'to' && drpFrom && !drpTo && drpHover && picking !== 'done'){
+            if(drpFrom && !drpTo && drpHover){
                 if(drpHover >= drpFrom){ effTo = drpHover; }
                 else { effFrom = drpHover; effTo = drpFrom; }
             }
@@ -1436,29 +1436,20 @@ function connectFlaskLive(){const socket=io({transports:['websocket','polling'],
     };
 
     window.drpHoverDay = function(ds){
-        // only highlight when actively waiting for 'to' selection
-        if(picking === 'to' && drpFrom && !drpTo){
-            drpHover = ds;
-            renderBoth();
-        } else {
-            // make sure stale hover is cleared
-            if(drpHover !== null){ drpHover = null; }
-        }
+        if(picking === 'to' && drpFrom && !drpTo){ drpHover=ds; renderBoth(); }
     };
 
     window.drpClickDay = function(ds){
         if(!drpFrom || (drpFrom && drpTo)){
-            // start fresh — first click
+            // start fresh
             drpFrom=ds; drpTo=null; drpHover=null; picking='to';
-            renderBoth();
         } else {
-            // second click — lock the range
+            // second click = end
             if(ds < drpFrom){ drpTo=drpFrom; drpFrom=ds; }
             else { drpTo=ds; }
-            drpHover = null;
-            picking  = 'done';   // ← sentinel: no more hover until next fresh start
-            renderBoth();
+            drpHover=null; picking='from';
         }
+        renderBoth();
     };
 
     window.drpPreset = function(p){
