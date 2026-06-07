@@ -85,6 +85,9 @@
         .stat-btn{transition:all 0.15s ease;cursor:pointer}.stat-btn:hover{filter:brightness(1.1);transform:scale(1.05)}.stat-btn:active{transform:scale(0.97)}
         .mini-chart{width:100%;height:80px}
         #col-mapper-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:200}
+        /* ── Fix: Date Range Picker calendar always on top ── */
+        #range-container{position:relative;z-index:999}
+        #drp-popup{z-index:99999!important}
         #col-mapper-overlay.active{display:flex}
         .sn-badge{display:inline-block;background:rgba(139,92,246,0.2);color:#a78bfa;border:1px solid rgba(139,92,246,0.4);border-radius:6px;font-size:9px;font-weight:900;letter-spacing:0.08em;padding:1px 6px;text-transform:uppercase;vertical-align:middle;margin-left:4px;white-space:nowrap}
         .live-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;animation:livepulse 1.4s ease-in-out infinite}
@@ -280,7 +283,7 @@
     </div>
 
     <!-- ── FILTER ROW ── Date Range + Shift + Line + Station ── -->
-    <div class="glass p-4 rounded-2xl mb-4 border-t-2 border-blue-500/50">
+    <div class="glass p-4 rounded-2xl mb-4 border-t-2 border-blue-500/50" style="overflow:visible">
         <div class="flex flex-wrap gap-4 items-end">
             <!-- Time Filter Type -->
             <div>
@@ -301,31 +304,7 @@
                     <span id="drp-label">&#x0E40;&#x0E25;&#x0E37;&#x0E2D;&#x0E01;&#x0E0A;&#x0E48;&#x0E27;&#x0E07;&#x0E27;&#x0E31;&#x0E19;&#x0E17;&#x0E35;&#x0E48;</span>
                     <span class="ml-auto text-slate-500">&#9660;</span>
                 </button>
-                <div id="drp-popup" class="hidden absolute top-full left-0 mt-2 z-[300] select-none" style="filter:drop-shadow(0 8px 32px rgba(0,0,0,0.5))">
-                    <div id="drp-inner" class="glass rounded-2xl overflow-hidden" style="width:580px;border-top:3px solid #3b82f6">
-                        <div class="flex gap-1 p-3 border-b border-white/10 flex-wrap">
-                            <button onclick="drpPreset('today')"     class="drp-preset-btn px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 hover:border-blue-500 hover:text-blue-400 transition-all">&#x0E27;&#x0E31;&#x0E19;&#x0E19;&#x0E35;&#x0E49;</button>
-                            <button onclick="drpPreset('yesterday')" class="drp-preset-btn px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 hover:border-blue-500 hover:text-blue-400 transition-all">&#x0E40;&#x0E21;&#x0E37;&#x0E48;&#x0E2D;&#x0E27;&#x0E32;&#x0E19;</button>
-                            <button onclick="drpPreset('7d')"        class="drp-preset-btn px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 hover:border-blue-500 hover:text-blue-400 transition-all">7 &#x0E27;&#x0E31;&#x0E19;</button>
-                            <button onclick="drpPreset('30d')"       class="drp-preset-btn px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 hover:border-blue-500 hover:text-blue-400 transition-all">30 &#x0E27;&#x0E31;&#x0E19;</button>
-                            <button onclick="drpPreset('thismonth')" class="drp-preset-btn px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 hover:border-blue-500 hover:text-blue-400 transition-all">&#x0E40;&#x0E14;&#x0E37;&#x0E2D;&#x0E19;&#x0E19;&#x0E35;&#x0E49;</button>
-                            <button onclick="drpPreset('lastmonth')" class="drp-preset-btn px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 hover:border-blue-500 hover:text-blue-400 transition-all">&#x0E40;&#x0E14;&#x0E37;&#x0E2D;&#x0E19;&#x0E17;&#x0E35;&#x0E48;&#x0E41;&#x0E25;&#x0E49;&#x0E27;</button>
-                            <button onclick="drpClear()" class="drp-preset-btn ml-auto px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-red-500/40 text-red-400 hover:bg-red-500/10 transition-all">&#x0E25;&#x0E49;&#x0E32;&#x0E07;</button>
-                        </div>
-                        <div class="flex gap-0 divide-x divide-white/10">
-                            <div id="drp-cal-left"  class="flex-1 p-3"></div>
-                            <div id="drp-cal-right" class="flex-1 p-3"></div>
-                        </div>
-                        <div class="flex items-center justify-between px-4 py-3 border-t border-white/10 bg-slate-900/30">
-                            <div class="text-xs font-black">
-                                <span class="text-slate-500">From </span><span id="drp-show-from" class="text-blue-400 font-mono">&#x2014;</span>
-                                <span class="text-slate-500 mx-2">&#x2192;</span>
-                                <span class="text-slate-500">To </span><span id="drp-show-to" class="text-blue-400 font-mono">&#x2014;</span>
-                            </div>
-                            <button onclick="drpApply()" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-black uppercase rounded-xl transition-all">Apply &#x2713;</button>
-                        </div>
-                    </div>
-                </div>
+
             </div>
             <input type="hidden" id="date-from">
             <input type="hidden" id="date-to">
@@ -979,7 +958,30 @@ function renderHourlyChart() {
         series: [
             { name: 'Pass', type: 'bar', data: passData, stack: 'total', yAxisIndex: 0, itemStyle: { color: { type:'linear',x:0,y:0,x2:0,y2:1, colorStops:[{offset:0,color:'#4ade80'},{offset:1,color:'#16a34a'}] }, borderRadius:[0,0,0,0] }, barMaxWidth: 40, emphasis: { itemStyle: { color: '#86efac' } } },
             { name: 'Fail', type: 'bar', data: failData, stack: 'total', yAxisIndex: 0, itemStyle: { color: { type:'linear',x:0,y:0,x2:0,y2:1, colorStops:[{offset:0,color:'#f87171'},{offset:1,color:'#b91c1c'}] }, borderRadius:[4,4,0,0] }, barMaxWidth: 40, emphasis: { itemStyle: { color: '#fca5a5' } } },
-            { name: 'Yield %', type: 'line', data: yieldData, yAxisIndex: 1, smooth: true, symbol: 'circle', symbolSize: 5, lineStyle: { color: '#818cf8', width: 2 }, itemStyle: { color: '#818cf8' }, areaStyle: { color: { type:'linear',x:0,y:0,x2:0,y2:1, colorStops:[{offset:0,color:'rgba(129,140,248,0.25)'},{offset:1,color:'rgba(129,140,248,0.0)'}] } } }
+            {
+                name: 'Yield %', type: 'line', data: yieldData, yAxisIndex: 1, smooth: true,
+                symbol: 'circle', symbolSize: 5,
+                lineStyle: { color: '#818cf8', width: 2 },
+                itemStyle: { color: '#818cf8' },
+                areaStyle: { color: { type:'linear',x:0,y:0,x2:0,y2:1, colorStops:[{offset:0,color:'rgba(129,140,248,0.25)'},{offset:1,color:'rgba(129,140,248,0.0)'}] } },
+                markLine: {
+                    silent: false,
+                    symbol: ['none','none'],
+                    animation: false,
+                    data: [{ yAxis: parseFloat(document.getElementById('yield-threshold').value||95) }],
+                    lineStyle: { color: '#ef4444', type: 'dashed', width: 2, opacity: 0.85 },
+                    label: {
+                        show: true,
+                        position: 'insideEndTop',
+                        formatter: p => `▼ Threshold: ${p.value}%`,
+                        color: '#ef4444',
+                        fontSize: 10,
+                        fontWeight: 900,
+                        backgroundColor: 'rgba(15,23,42,0.75)',
+                        padding: [3,6]
+                    }
+                }
+            }
         ]
     });
 
@@ -1347,9 +1349,15 @@ function connectFlaskLive(){const socket=io({transports:['websocket','polling'],
 
         let html = `
         <div class="flex items-center justify-between mb-2">
-            ${isLeft ? `<button onclick="drpNavMonth(-1)" class="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all font-black text-base">&#8249;</button>` : '<div class="w-7"></div>'}
+            <div class="flex gap-0.5">
+                ${isLeft ? `<button onclick="drpNavYear(-1)" title="ย้อนหลัง 1 ปี" class="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-white hover:bg-white/10 transition-all font-black text-xs">&#171;</button>` : '<div class="w-7"></div>'}
+                ${isLeft ? `<button onclick="drpNavMonth(-1)" title="ย้อนหลัง 1 เดือน" class="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all font-black text-base">&#8249;</button>` : '<div class="w-14"></div>'}
+            </div>
             <span class="text-xs font-black text-white uppercase tracking-wider">${MONTHS_TH[month]} ${year}</span>
-            ${!isLeft ? `<button onclick="drpNavMonth(1)" class="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all font-black text-base">&#8250;</button>` : '<div class="w-7"></div>'}
+            <div class="flex gap-0.5">
+                ${!isLeft ? `<button onclick="drpNavMonth(1)" title="ไปข้างหน้า 1 เดือน" class="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all font-black text-base">&#8250;</button>` : '<div class="w-14"></div>'}
+                ${!isLeft ? `<button onclick="drpNavYear(1)" title="ไปข้างหน้า 1 ปี" class="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-white hover:bg-white/10 transition-all font-black text-xs">&#187;</button>` : '<div class="w-7"></div>'}
+            </div>
         </div>
         <div class="grid grid-cols-7 mb-1">
             ${DAYS_TH.map(d=>`<div class="drp-dow">${d}</div>`).join('')}
@@ -1363,9 +1371,9 @@ function connectFlaskLive(){const socket=io({transports:['websocket','polling'],
             const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
             let cls = 'drp-day';
             if(ds===todayStr) cls+=' drp-today';
-            // determine effective range for hover highlight
+            // determine effective range for hover highlight (only while picking 'to')
             let effFrom = drpFrom, effTo = drpTo;
-            if(drpFrom && !drpTo && drpHover){
+            if(picking === 'to' && drpFrom && !drpTo && drpHover && picking !== 'done'){
                 if(drpHover >= drpFrom){ effTo = drpHover; }
                 else { effFrom = drpHover; effTo = drpFrom; }
             }
@@ -1388,30 +1396,32 @@ function connectFlaskLive(){const socket=io({transports:['websocket','polling'],
         document.getElementById('drp-show-to').innerText   = fmt(drpTo);
     }
 
+    let _calInited = false;
     window.toggleCalendar = function(){
         isOpen = !isOpen;
-        const popup = document.getElementById('drp-popup');
+        const popup   = document.getElementById('drp-popup');
+        const trigger = document.getElementById('drp-trigger');
         if(isOpen){
-            initMonths();
-            popup.classList.remove('hidden');
+            if(!_calInited){ initMonths(); _calInited = true; }
             renderBoth();
-            // close on outside click
-            setTimeout(()=>document.addEventListener('click', outsideClick), 10);
+            popup.classList.remove('hidden');
+            // position: fixed + clamp to viewport
+            const rect   = trigger.getBoundingClientRect();
+            const popupW = 588;
+            const popupH = popup.offsetHeight || 430;
+            let left = rect.left;
+            if (left + popupW > window.innerWidth - 8) left = window.innerWidth - popupW - 8;
+            if (left < 8) left = 8;
+            let top = rect.bottom + 6;
+            if (top + popupH > window.innerHeight - 8) top = rect.top - popupH - 6;
+            if (top < 8) top = 8;
+            popup.style.top  = top  + 'px';
+            popup.style.left = left + 'px';
         } else {
             popup.classList.add('hidden');
-            document.removeEventListener('click', outsideClick);
         }
     };
-
-    function outsideClick(e){
-        const popup  = document.getElementById('drp-popup');
-        const trigger= document.getElementById('drp-trigger');
-        if(popup && !popup.contains(e.target) && !trigger.contains(e.target)){
-            isOpen=false;
-            popup.classList.add('hidden');
-            document.removeEventListener('click', outsideClick);
-        }
-    }
+    // ── No outsideClick: popup only closes via Apply or X button ──
 
     window.drpNavMonth = function(dir){
         calLeftM += dir;
@@ -1420,21 +1430,35 @@ function connectFlaskLive(){const socket=io({transports:['websocket','polling'],
         renderBoth();
     };
 
+    window.drpNavYear = function(dir){
+        calLeftY += dir;
+        renderBoth();
+    };
+
     window.drpHoverDay = function(ds){
-        if(drpFrom && !drpTo){ drpHover=ds; renderBoth(); }
+        // only highlight when actively waiting for 'to' selection
+        if(picking === 'to' && drpFrom && !drpTo){
+            drpHover = ds;
+            renderBoth();
+        } else {
+            // make sure stale hover is cleared
+            if(drpHover !== null){ drpHover = null; }
+        }
     };
 
     window.drpClickDay = function(ds){
         if(!drpFrom || (drpFrom && drpTo)){
-            // start fresh
+            // start fresh — first click
             drpFrom=ds; drpTo=null; drpHover=null; picking='to';
+            renderBoth();
         } else {
-            // second click = end
+            // second click — lock the range
             if(ds < drpFrom){ drpTo=drpFrom; drpFrom=ds; }
             else { drpTo=ds; }
-            drpHover=null; picking='from';
+            drpHover = null;
+            picking  = 'done';   // ← sentinel: no more hover until next fresh start
+            renderBoth();
         }
-        renderBoth();
     };
 
     window.drpPreset = function(p){
@@ -1480,10 +1504,11 @@ function connectFlaskLive(){const socket=io({transports:['websocket','polling'],
         const effTo = drpTo || drpFrom;
         document.getElementById('date-from').value = drpFrom;
         document.getElementById('date-to').value   = effTo;
-        if(!drpTo) drpTo=effTo;
+        drpTo = effTo;
+        drpHover = null;
+        picking  = 'from';   // ── reset so next open starts fresh ──
         isOpen=false;
         document.getElementById('drp-popup').classList.add('hidden');
-        document.removeEventListener('click', outsideClick);
         updateDrpLabel();
         updateUI();
     };
@@ -1508,5 +1533,35 @@ function connectFlaskLive(){const socket=io({transports:['websocket','polling'],
 
 updateUI();
 </script>
+
+<!-- ── Date Range Picker Popup (teleported to body to escape stacking/overflow) ── -->
+<div id="drp-popup" class="hidden select-none" style="position:fixed;z-index:99999;filter:drop-shadow(0 8px 32px rgba(0,0,0,0.55))">
+    <div id="drp-inner" class="glass rounded-2xl overflow-hidden" style="width:580px;border-top:3px solid #3b82f6">
+        <div class="flex gap-1 p-3 border-b border-white/10 flex-wrap">
+            <button onclick="drpPreset('today')"     class="drp-preset-btn px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 hover:border-blue-500 hover:text-blue-400 transition-all">&#x0E27;&#x0E31;&#x0E19;&#x0E19;&#x0E35;&#x0E49;</button>
+            <button onclick="drpPreset('yesterday')" class="drp-preset-btn px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 hover:border-blue-500 hover:text-blue-400 transition-all">&#x0E40;&#x0E21;&#x0E37;&#x0E48;&#x0E2D;&#x0E27;&#x0E32;&#x0E19;</button>
+            <button onclick="drpPreset('7d')"        class="drp-preset-btn px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 hover:border-blue-500 hover:text-blue-400 transition-all">7 &#x0E27;&#x0E31;&#x0E19;</button>
+            <button onclick="drpPreset('30d')"       class="drp-preset-btn px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 hover:border-blue-500 hover:text-blue-400 transition-all">30 &#x0E27;&#x0E31;&#x0E19;</button>
+            <button onclick="drpPreset('thismonth')" class="drp-preset-btn px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 hover:border-blue-500 hover:text-blue-400 transition-all">&#x0E40;&#x0E14;&#x0E37;&#x0E2D;&#x0E19;&#x0E19;&#x0E35;&#x0E49;</button>
+            <button onclick="drpPreset('lastmonth')" class="drp-preset-btn px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 hover:border-blue-500 hover:text-blue-400 transition-all">&#x0E40;&#x0E14;&#x0E37;&#x0E2D;&#x0E19;&#x0E17;&#x0E35;&#x0E48;&#x0E41;&#x0E25;&#x0E49;&#x0E27;</button>
+            <button onclick="drpClear()" class="drp-preset-btn ml-auto px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-red-500/40 text-red-400 hover:bg-red-500/10 transition-all">&#x0E25;&#x0E49;&#x0E32;&#x0E07;</button>
+        </div>
+        <div class="flex gap-0 divide-x divide-white/10">
+            <div id="drp-cal-left"  class="flex-1 p-3"></div>
+            <div id="drp-cal-right" class="flex-1 p-3"></div>
+        </div>
+        <div class="flex items-center justify-between px-4 py-3 border-t border-white/10 bg-slate-900/30">
+            <div class="text-xs font-black">
+                <span class="text-slate-500">From </span><span id="drp-show-from" class="text-blue-400 font-mono">&#x2014;</span>
+                <span class="text-slate-500 mx-2">&#x2192;</span>
+                <span class="text-slate-500">To </span><span id="drp-show-to" class="text-blue-400 font-mono">&#x2014;</span>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="toggleCalendar()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-[11px] font-black uppercase rounded-xl transition-all">&#x2715; ปิด</button>
+                <button onclick="drpApply()" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-black uppercase rounded-xl transition-all">Apply &#x2713;</button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
