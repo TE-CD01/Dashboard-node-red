@@ -1371,9 +1371,9 @@ function connectFlaskLive(){const socket=io({transports:['websocket','polling'],
             const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
             let cls = 'drp-day';
             if(ds===todayStr) cls+=' drp-today';
-            // determine effective range for hover highlight
+            // determine effective range for hover highlight (only while picking 'to')
             let effFrom = drpFrom, effTo = drpTo;
-            if(drpFrom && !drpTo && drpHover){
+            if(picking === 'to' && drpFrom && !drpTo && drpHover && picking !== 'done'){
                 if(drpHover >= drpFrom){ effTo = drpHover; }
                 else { effFrom = drpHover; effTo = drpFrom; }
             }
@@ -1381,7 +1381,7 @@ function connectFlaskLive(){const socket=io({transports:['websocket','polling'],
             else if(ds===effFrom) cls+=' drp-sel-start';
             else if(ds===effTo)   cls+=' drp-sel-end';
             else if(effFrom && effTo && ds>effFrom && ds<effTo) cls+=' drp-in-range';
-            html+=`<div class="${cls}" data-d="${ds}" onmouseenter="drpHoverDay('${ds}')" onclick="drpClickDay('${ds}')">${d}</div>`;
+            html+=`<div class="${cls}" data-d="${ds}" onmouseenter="if(picking==='to')drpHoverDay('${ds}')" onclick="drpClickDay('${ds}')">${d}</div>`;
         }
         html+='</div>';
         el.innerHTML = html;
@@ -1436,20 +1436,31 @@ function connectFlaskLive(){const socket=io({transports:['websocket','polling'],
     };
 
     window.drpHoverDay = function(ds){
-        if(picking === 'to' && drpFrom && !drpTo){ drpHover=ds; renderBoth(); }
+        if(picking === 'to' && drpFrom && !drpTo && !_locked){
+            drpHover = ds;
+            renderBoth();
+        }
     };
 
+    let _locked = false;
     window.drpClickDay = function(ds){
-        if(!drpFrom || (drpFrom && drpTo)){
-            // start fresh
-            drpFrom=ds; drpTo=null; drpHover=null; picking='to';
+        if(_locked) return;
+        if(!drpFrom || drpTo){
+            // fresh start
+            drpFrom = ds; drpTo = null; drpHover = null; picking = 'to';
+            _locked = false;
+            renderBoth();
         } else {
-            // second click = end
-            if(ds < drpFrom){ drpTo=drpFrom; drpFrom=ds; }
-            else { drpTo=ds; }
-            drpHover=null; picking='from';
+            // second click — lock immediately
+            _locked = true;
+            if(ds < drpFrom){ drpTo = drpFrom; drpFrom = ds; }
+            else { drpTo = ds; }
+            drpHover = null;
+            picking  = 'done';
+            renderBoth();
+            // unlock after a tick so stray mouseenter events are ignored
+            setTimeout(()=>{ _locked = false; }, 50);
         }
-        renderBoth();
     };
 
     window.drpPreset = function(p){
@@ -1482,7 +1493,7 @@ function connectFlaskLive(){const socket=io({transports:['websocket','polling'],
     };
 
     window.drpClear = function(){
-        drpFrom=null; drpTo=null; drpHover=null; picking='from';
+        drpFrom=null; drpTo=null; drpHover=null; picking='from'; _locked=false;
         document.getElementById('date-from').value='';
         document.getElementById('date-to').value='';
         updateDrpLabel();
@@ -1497,7 +1508,8 @@ function connectFlaskLive(){const socket=io({transports:['websocket','polling'],
         document.getElementById('date-to').value   = effTo;
         drpTo = effTo;
         drpHover = null;
-        picking  = 'from';   // ── reset so next open starts fresh ──
+        picking  = 'from';
+        _locked  = false;
         isOpen=false;
         document.getElementById('drp-popup').classList.add('hidden');
         updateDrpLabel();
